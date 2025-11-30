@@ -1,15 +1,8 @@
 🗺️ AOI Creation Tool
 
-A modern web application for defining Areas of Interest (AOI) on satellite imagery using interactive mapping features. Built for Flowbit Private Limited's Frontend Engineer Internship Assignment.
+A modern web application for defining Areas of Interest (AOI) on satellite imagery using interactive mapping features. 
 
-Show Image
-Show Image
-Show Image
-Show Image
-Show Image
-
-📺 Demo Video
-▶️ Watch Demo Video (3-5 minutes)
+📺 Demo Video: 
 
 📖 Table of Contents
 
@@ -26,14 +19,15 @@ Performance
 
 
 🎯 Overview
+
 The AOI Creation Tool is a single-page application that allows users to define geographical Areas of Interest on satellite/drone imagery. Users can search for locations, draw custom polygons, and manage multiple areas with an intuitive interface.
 What Problem Does It Solve?
 Organizations working with geospatial data need a simple way to:
 
-Define specific geographical regions for analysis
-Visualize areas on satellite imagery
-Manage multiple areas of interest
-Export area definitions for further processing
+- Define specific geographical regions for analysis
+- Visualize areas on satellite imagery
+- Manage multiple areas of interest
+- Export area definitions for further processing
 
 Key Capabilities
 
