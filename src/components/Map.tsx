@@ -131,7 +131,15 @@ const DrawingLayer: React.FC<{
   const pointsRef = useRef<L.LatLng[]>([]);
 
   useEffect(() => {
-    if (!isDrawing) return;
+    if (!isDrawing) {
+      // Clean up when drawing mode is disabled
+      if (drawingRef.current) {
+        map.removeLayer(drawingRef.current);
+        drawingRef.current = null;
+      }
+      pointsRef.current = [];
+      return;
+    }
 
     const handleClick = (e: L.LeafletMouseEvent) => {
       pointsRef.current.push(e.latlng);
@@ -143,12 +151,14 @@ const DrawingLayer: React.FC<{
       // Draw temporary line
       drawingRef.current = L.polyline(pointsRef.current, {
         color: '#FFD700',
-        weight: 2,
+        weight: 3,
         dashArray: '5, 5'
       }).addTo(map);
     };
 
-    const handleDblClick = () => {
+    const handleDblClick = (e: L.LeafletMouseEvent) => {
+      L.DomEvent.stopPropagation(e);
+      
       if (pointsRef.current.length >= 3) {
         // Convert to GeoJSON format
         const coordinates = [
@@ -172,9 +182,13 @@ const DrawingLayer: React.FC<{
     map.on('click', handleClick);
     map.on('dblclick', handleDblClick);
 
+    // Change cursor to crosshair
+    map.getContainer().style.cursor = 'crosshair';
+
     return () => {
       map.off('click', handleClick);
       map.off('dblclick', handleDblClick);
+      map.getContainer().style.cursor = '';
       if (drawingRef.current) {
         map.removeLayer(drawingRef.current);
       }
@@ -219,13 +233,17 @@ const Map: React.FC<MapProps> = ({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
         ) : (
-          <WMSTileLayer
-            url={WMS_CONFIG.url}
-            layers={WMS_CONFIG.layers}
-            format={WMS_CONFIG.format}
-            transparent={WMS_CONFIG.transparent}
-            attribution={WMS_CONFIG.attribution}
-          />
+       <WMSTileLayer
+  url={WMS_CONFIG.url}
+  params={{
+    version: WMS_CONFIG.version, // 1.1.1
+    layers: WMS_CONFIG.layers,
+    format: WMS_CONFIG.format,
+    transparent: WMS_CONFIG.transparent,
+  }}
+  attribution={WMS_CONFIG.attribution}
+/>
+
         )}
 
         {/* Preview polygon for selected search result (dashed orange) */}

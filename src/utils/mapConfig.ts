@@ -2,18 +2,20 @@ import type { MapPosition } from '../types/map.types';
 
 // WMS Configuration for the satellite imagery
 export const WMS_CONFIG = {
-  url: 'https://www.wms.nrw.de/geobasis/wms_nw_dop',
+  url: '/wms', // proxied path (see vite.config.ts)
   layers: 'nw_dop_rgb',
   format: 'image/png',
-  transparent: true,
-  attribution: '&copy; Geobasis NRW'
+  transparent: false, // DOP is full imagery
+  attribution: '&copy; Geobasis NRW',
+  version: '1.1.1', // important to match Leaflet defaults (SRS)
 };
 
-// Default map center (Cologne, Germany)
+
+// Default map center (Düsseldorf, Germany - in NRW region where WMS works)
 export const DEFAULT_MAP_POSITION: MapPosition = {
-  lat: 50.9375,
-  lng: 6.9603,
-  zoom: 11
+  lat: 51.2277,
+  lng: 6.7735,
+  zoom: 12
 };
 
 // Colors for drawn areas

@@ -16,6 +16,8 @@ interface SidebarProps {
   onDeleteArea: (id: string) => void;
   onApplyOutline?: () => void;
   selectedSearchResult?: SearchResult | null;
+  onDrawModeToggle?: () => void;
+  isDrawingMode?: boolean;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -31,7 +33,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   onToggleAreaVisibility,
   onDeleteArea,
   onApplyOutline,
-  selectedSearchResult
+  selectedSearchResult,
+  onDrawModeToggle,
+  isDrawingMode = false
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
@@ -52,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
     // Cleanup: cancel the timer if user keeps typing
     return () => clearTimeout(timer);
-  }, [searchQuery]); // Remove onSearch from dependencies to prevent re-triggering
+  }, [searchQuery]);
 
   const handleSearchResultClick = (result: SearchResult) => {
     setSearchQuery(result.display_name);
@@ -110,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               />
             </div>
 
-            {/* Search Results Dropdown - MOVED BELOW to not cover other elements */}
+            {/* Search Results Dropdown */}
             {showResults && searchResults.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg border border-gray-300 shadow-lg z-50 max-h-48 overflow-y-auto">
                 {searchResults.map((result, index) => (
@@ -147,6 +151,23 @@ const Sidebar: React.FC<SidebarProps> = ({
             </button>
           )}
 
+          {/* Draw on Map Button */}
+          <button
+            onClick={onDrawModeToggle}
+            className={`w-full rounded-lg border p-4 transition-colors flex items-center mb-4 ${
+              isDrawingMode
+                ? 'bg-orange-primary text-white border-orange-primary'
+                : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+            }`}
+          >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+            <span className="text-base font-medium">
+              {isDrawingMode ? 'Drawing mode active...' : 'Draw area on map'}
+            </span>
+          </button>
+
           {/* Upload Shapefile Button */}
           <button
             onClick={onUploadShapefile}
@@ -161,6 +182,12 @@ const Sidebar: React.FC<SidebarProps> = ({
           {selectedSearchResult && (
             <p className="text-xs text-gray-500 mt-4">
               You can always edit the shape of the area later
+            </p>
+          )}
+
+          {isDrawingMode && (
+            <p className="text-xs text-orange-primary mt-4 font-medium">
+              Click on the map to add points. Double-click to complete the polygon.
             </p>
           )}
         </div>
