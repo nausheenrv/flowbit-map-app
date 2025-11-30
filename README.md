@@ -31,15 +31,15 @@ Organizations working with geospatial data need a simple way to:
 
 Key Capabilities
 
-Search & Geocoding: Find any location worldwide using natural language search
-Boundary Detection: Automatically detect city/region boundaries from search results
-Manual Drawing: Draw custom polygons by clicking points on the map
-Multi-Area Management: Create, view, hide, and delete multiple areas
-Dual Map Views: Toggle between street maps and satellite imagery
-Data Persistence: Areas are automatically saved and restored between sessions
+- Search & Geocoding: Find any location worldwide using natural language search
+- Boundary Detection: Automatically detect city/region boundaries from search results
+- Manual Drawing: Draw custom polygons by clicking points on the map
+- Multi-Area Management: Create, view, hide, and delete multiple areas
+- Dual Map Views: Toggle between street maps and satellite imagery
 
 
 ✨ Features
+
 Core Features
 FeatureDescriptionStatusGeocoding SearchSearch for cities, regions, and addresses worldwide using Nominatim✅ CompleteBoundary PreviewPreview location boundaries before creating an area✅ CompleteArea CreationCreate areas from search results with one click✅ CompleteManual DrawingDraw custom polygons by clicking points on the map✅ CompleteArea ManagementView, hide, show, and delete multiple areas✅ CompleteMap View ToggleSwitch between street and satellite views✅ CompleteWMS IntegrationDisplay high-resolution satellite imagery from NRW Geobasis✅ CompletelocalStorage PersistenceAutomatically save and restore areas✅ Complete
 Bonus Features Implemented
@@ -52,50 +52,57 @@ Bonus Features Implemented
 
 
 🛠️ Tech Stack
+
+
 Core Technologies
 
-React 18.3 - UI framework with hooks
-TypeScript 5.5 - Type safety and developer experience
-Vite 6.0 - Lightning-fast build tool and dev server
-Tailwind CSS 3.4 - Utility-first CSS framework
+- React 18.3 - UI framework with hooks
+- TypeScript 5.5 - Type safety and developer experience
+- Vite 6.0 - Lightning-fast build tool and dev server
+- Tailwind CSS 3.4 - Utility-first CSS framework
 
 Mapping & Geospatial
 
-Leaflet 1.9 - Interactive map rendering
-react-leaflet 4.2 - React bindings for Leaflet
-Nominatim API - OpenStreetMap geocoding service
-WMS (Web Map Service) - NRW Geobasis satellite imagery
+- Leaflet 1.9 - Interactive map rendering
+- react-leaflet 4.2 - React bindings for Leaflet
+- Nominatim API - OpenStreetMap geocoding service
+- WMS (Web Map Service) - NRW Geobasis satellite imagery
 
 Testing & Quality
 
-Playwright - End-to-end testing framework
-ESLint - JavaScript/TypeScript linting
-Prettier - Code formatting
+- Playwright - End-to-end testing framework
+- ESLint - JavaScript/TypeScript linting
+- Prettier - Code formatting
 
 
 🚀 Getting Started
+
 Prerequisites
+
 Ensure you have the following installed:
 
-Node.js >= 18.0.0 (Download)
-npm >= 9.0.0 (comes with Node.js)
+- Node.js >= 18.0.0 (Download)
+- npm >= 9.0.0 (comes with Node.js)
 
 Check your versions:
-bashnode --version  # Should output v18.x.x or higher
-npm --version   # Should output 9.x.x or higher
+
+- bashnode --version  # Should output v18.x.x or higher
+- npm --version   # Should output 9.x.x or higher
+
+  
 Installation
 
-Clone the repository
+Clone the repository: 
 
 bashgit clone https://github.com/YOUR_USERNAME/flowbit-map-app.git
 cd flowbit-map-app
 
-Install dependencies
+Install dependencies:
 
 bashnpm install
 This will install all required packages (~200MB, takes 1-2 minutes).
 
-Start the development server
+Start the development server:
 
 bashnpm run dev
 ```
@@ -112,15 +119,6 @@ VITE v6.0.0  ready in 300 ms
 Open in browser
 
 Navigate to http://localhost:5173 to see the application.
-Available Scripts
-CommandDescriptionnpm run devStart development server at http://localhost:5173npm run buildBuild production bundle to dist/ foldernpm run previewPreview production build locallynpm testRun Playwright tests in headless modenpm run test:uiRun Playwright tests with interactive UInpm run test:reportView detailed test reportnpm run lintCheck code for linting errorsnpm run formatAuto-format code with Prettier
-Building for Production
-bash# Create optimized production build
-npm run build
-
-# Output will be in dist/ folder
-# Deploy dist/ folder to any static hosting service
-```
 
 ---
 
