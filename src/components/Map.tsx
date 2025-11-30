@@ -48,7 +48,7 @@ const MapControls: React.FC<{
   );
 };
 
-// Component to handle map fly-to on search
+// Component to handle map fly-to on search AND show preview polygon
 const MapController: React.FC<{ searchResult: SearchResult | null }> = ({ searchResult }) => {
   const map = useMap();
 
@@ -70,6 +70,55 @@ const MapController: React.FC<{ searchResult: SearchResult | null }> = ({ search
   }, [searchResult, map]);
 
   return null;
+};
+
+// Preview polygon for selected search result
+const SearchResultPreview: React.FC<{ searchResult: SearchResult | null }> = ({ searchResult }) => {
+  if (!searchResult) return null;
+
+  let coordinates: [number, number][];
+
+  // If has GeoJSON polygon
+  if (searchResult.geojson && searchResult.geojson.type === 'Polygon') {
+    coordinates = searchResult.geojson.coordinates[0].map((coord: number[]) => [coord[1], coord[0]]);
+  }
+  // If has bounding box
+  else if (searchResult.boundingbox) {
+    const [south, north, west, east] = searchResult.boundingbox.map(parseFloat);
+    coordinates = [
+      [south, west],
+      [south, east],
+      [north, east],
+      [north, west],
+      [south, west]
+    ];
+  }
+  // Fallback: small area around point
+  else {
+    const lat = parseFloat(searchResult.lat);
+    const lon = parseFloat(searchResult.lon);
+    const offset = 0.01;
+    coordinates = [
+      [lat - offset, lon - offset],
+      [lat - offset, lon + offset],
+      [lat + offset, lon + offset],
+      [lat + offset, lon - offset],
+      [lat - offset, lon - offset]
+    ];
+  }
+
+  return (
+    <Polygon
+      positions={coordinates}
+      pathOptions={{
+        color: '#FF6B35',
+        fillColor: '#FF6B35',
+        fillOpacity: 0.2,
+        weight: 3,
+        dashArray: '10, 10'
+      }}
+    />
+  );
 };
 
 // Component to enable drawing on map
@@ -166,8 +215,8 @@ const Map: React.FC<MapProps> = ({
         {/* Base Layer - Street or Satellite */}
         {mapView === 'street' ? (
           <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
         ) : (
           <WMSTileLayer
@@ -175,23 +224,54 @@ const Map: React.FC<MapProps> = ({
             layers={WMS_CONFIG.layers}
             format={WMS_CONFIG.format}
             transparent={WMS_CONFIG.transparent}
+            attribution={WMS_CONFIG.attribution}
           />
         )}
 
-        {/* Drawn Areas */}
-        {areas.map((area) => (
-          <Polygon key={area.id} positions={area.coordinates as L.LatLngExpression[][]} pathOptions={{ color: 'blue' }} />
+        {/* Preview polygon for selected search result (dashed orange) */}
+        <SearchResultPreview searchResult={searchResult} />
+
+        {/* Drawn Areas (solid colored) */}
+        {areas.filter(area => area.visible).map((area) => (
+          <Polygon
+            key={area.id}
+            positions={area.coordinates[0].map(coord => [coord[1], coord[0]])}
+            pathOptions={{
+              color: area.color,
+              fillColor: area.color,
+              fillOpacity: 0.3,
+              weight: 2
+            }}
+          />
         ))}
 
-        {/* Map Controls */}
-        {onRestart && <MapControls onRestart={onRestart} mapView={mapView} onToggleView={onToggleView} />}
-
-        {/* Search Result Controller */}
+        {/* Map Controller for search */}
         <MapController searchResult={searchResult} />
 
         {/* Drawing Layer */}
-        {isDrawingMode && <DrawingLayer isDrawing={isDrawingMode} onPolygonComplete={onPolygonComplete || (() => {})} />}
+        {isDrawingMode && onPolygonComplete && (
+          <DrawingLayer
+            isDrawing={isDrawingMode}
+            onPolygonComplete={onPolygonComplete}
+          />
+        )}
+
+        {/* Map Controls */}
+        <MapControls
+          onRestart={onRestart || (() => {})}
+          mapView={mapView}
+          onToggleView={onToggleView}
+        />
       </MapContainer>
+
+      {/* Drawing Instructions */}
+      {isDrawingMode && (
+        <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-[1000] bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg">
+          <p className="text-sm font-medium">
+            Click to add points, double-click to complete polygon
+          </p>
+        </div>
+      )}
     </div>
   );
 };

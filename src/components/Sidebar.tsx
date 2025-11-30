@@ -36,23 +36,37 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
 
+  // Improved debouncing - only search when user stops typing
   useEffect(() => {
-    if (searchQuery.length > 2) {
-      const timer = setTimeout(() => {
-        onSearch?.(searchQuery);
-        setShowResults(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    } else {
+    // Don't search if query is too short or if we already have a selected result
+    if (searchQuery.length < 3 || selectedSearchResult) {
       setShowResults(false);
+      return;
     }
-  }, [searchQuery, onSearch]);
+
+    // Debounce: wait 600ms after user stops typing
+    const timer = setTimeout(() => {
+      onSearch?.(searchQuery);
+      setShowResults(true);
+    }, 600);
+
+    // Cleanup: cancel the timer if user keeps typing
+    return () => clearTimeout(timer);
+  }, [searchQuery]); // Remove onSearch from dependencies to prevent re-triggering
 
   const handleSearchResultClick = (result: SearchResult) => {
     setSearchQuery(result.display_name);
     setShowResults(false);
     onSearchResultSelect?.(result);
   };
+
+  // Clear search when outline is applied
+  useEffect(() => {
+    if (!selectedSearchResult) {
+      setSearchQuery('');
+      setShowResults(false);
+    }
+  }, [selectedSearchResult]);
 
   // Define AOI View
   if (viewMode === 'define-aoi') {
@@ -91,13 +105,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                 placeholder="city, town, region..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchResults.length > 0 && setShowResults(true)}
                 className="w-full pl-12 pr-4 py-3 text-base text-gray-700 placeholder-gray-400 bg-transparent outline-none rounded-lg"
               />
             </div>
 
-            {/* Search Results Dropdown */}
+            {/* Search Results Dropdown - MOVED BELOW to not cover other elements */}
             {showResults && searchResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg border border-gray-300 shadow-lg z-10 max-h-64 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg border border-gray-300 shadow-lg z-50 max-h-48 overflow-y-auto">
                 {searchResults.map((result, index) => (
                   <button
                     key={index}
@@ -107,7 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <div className="font-medium text-gray-900 text-sm">
                       {result.display_name.split(',')[0]}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-gray-500 mt-1 line-clamp-1">
                       {result.display_name}
                     </div>
                   </button>
@@ -116,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             )}
 
             {isSearching && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg border border-gray-300 shadow-lg p-4 text-center text-gray-500">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg border border-gray-300 shadow-lg p-4 text-center text-gray-500 z-50">
                 Searching...
               </div>
             )}
@@ -126,7 +141,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           {selectedSearchResult && (
             <button
               onClick={onApplyOutline}
-              className="w-full bg-orange-primary text-white rounded-lg p-4 hover:bg-orange-600 transition-colors flex items-center justify-center mb-4 font-medium"
+              className="w-full bg-orange-primary text-white rounded-lg p-4 hover:bg-orange-600 transition-colors flex items-center justify-center mb-4 font-medium shadow-md"
             >
               Apply outline as base image
             </button>

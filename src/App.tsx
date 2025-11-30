@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import Map from './components/Map';
 import type { DrawnArea, SearchResult, MapView, ViewMode } from './types/map.types';
@@ -13,11 +13,20 @@ function App() {
   const [selectedSearchResult, setSelectedSearchResult] = useState<SearchResult | null>(null);
   const [areas, setAreas] = useState<DrawnArea[]>([]);
   const [isDrawingMode, setIsDrawingMode] = useState(false);
+  
+  // Use ref to track the last search query to prevent duplicate searches
+  const lastSearchQuery = useRef('');
 
   // Handle search with Nominatim API
   const handleSearch = async (query: string) => {
     if (query.length < 3) return;
-
+    
+    // Prevent duplicate searches
+    if (query === lastSearchQuery.current) {
+      return;
+    }
+    
+    lastSearchQuery.current = query;
     setIsSearching(true);
     setSearchQuery(query);
 
@@ -39,6 +48,7 @@ function App() {
   const handleSearchResultSelect = (result: SearchResult) => {
     setSelectedSearchResult(result);
     setSearchResults([]);
+    lastSearchQuery.current = ''; // Reset so user can search again if needed
   };
 
   // Apply outline as base image - creates area from search result
@@ -88,6 +98,7 @@ function App() {
     setAreas([...areas, newArea]);
     setSelectedSearchResult(null);
     setViewMode('project-scope');
+    lastSearchQuery.current = ''; // Reset search
     
     // Switch to satellite view to see the area better
     setMapView('satellite');
@@ -136,6 +147,7 @@ function App() {
     setSelectedSearchResult(null);
     setSearchResults([]);
     setSearchQuery('');
+    lastSearchQuery.current = '';
   };
 
   // Handle back button
